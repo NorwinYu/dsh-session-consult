@@ -1,6 +1,8 @@
 # dsh-session-consult
 
 [![npm](https://img.shields.io/npm/v/dsh-session-consult.svg)](https://www.npmjs.com/package/dsh-session-consult)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/NorwinYu/dsh-session-consult/actions/workflows/ci.yml/badge.svg)](https://github.com/NorwinYu/dsh-session-consult/actions/workflows/ci.yml)
 
 Let one DeepSeek Harness session consult another session's history — read-only,
 cheap, and labelled with provenance.
@@ -9,17 +11,80 @@ A session is a good memory and a bad messenger: its context cannot be handed to
 another session, and asking it a question means waking it up, which changes it.
 This plugin adds the missing verb: **consult**.
 
-```js
-consult_session({ session, question })                // ask: a restricted child answers
-consult_session({ session, question, mode: "read" })  // read: return the digest itself
-consult_session({ mode: "list" })                     // discover what can be consulted
+> Not to be confused with [`dsh-consult`](https://www.npmjs.com/package/dsh-consult),
+> which consults *other models*. This plugin consults *other sessions*.
+
+## Quick start
+
+```sh
+dsh plugin --profile <profile> add dsh-session-consult
 ```
+
+Restart the app (the tool appears on the next start), then just ask:
+
+```
+Ask the billing-refactor session what migration order we settled on.
+```
+
+The model calls:
+
+```js
+consult_session({ session: "billing refactor", question: "Which migration order did we settle on?" })
+```
+
+and answers with a citation:
+
+```
+The migration order is customers → invoices → line items; a single-shot
+migration was rejected because the invoice backfill locks the ledger (T7).
+
+---
+source: session-c2Vzc2lvbi0… (persisted, captured through seq 1841) · 12 turns ·
+digest ≈5.9K tok · text retained 100%
+```
+
+Not sure what is consultable? Ask for the list:
+
+```
+Which sessions can I consult?        →  consult_session({ mode: "list" })
+```
+
+## Requirements
+
+- DeepSeek Harness `>=0.2.2-rc.1 <0.4.0` — the profile must mount `tools`,
+  `agents` and `sessionPersistence`; every standard profile does.
+- Node.js `>=22.15` for the offline tooling only; the plugin itself uses no Node
+  API beyond `node:crypto`.
+
+Install from a checkout instead, for unreleased work:
+
+```sh
+git clone https://github.com/NorwinYu/dsh-session-consult.git
+dsh plugin --profile <profile> add ./dsh-session-consult
+```
+
+## How it works
+
+```
+your session ──consult_session({ session, question })──►
+                     │
+                     │ 1. read the target's log (read-only, no lock)
+                     │ 2. build a bounded digest: text in, tool noise out
+                     │ 3. hand it to a throwaway child agent
+                     ▼
+             answer + provenance ──► back into your context
+```
+
+Three modes:
+
+| mode | what happens | cost |
+|---|---|---|
+| `ask` *(default)* | a tool-restricted child agent answers from the digest | one child turn |
+| `read` | the digest comes back to you; you reason over it | no child turn |
+| `list` | the sessions that can be consulted, with ids and ages | none |
 
 The consulted session is only ever **read**: its log is never written, it is
 never steered or resumed, and no lock is taken.
-
-> Not to be confused with [`dsh-consult`](https://www.npmjs.com/package/dsh-consult),
-> which consults *other models*. This plugin consults *other sessions*.
 
 ## Compared with `@`-referencing a session
 
@@ -39,99 +104,7 @@ That is a different tool for a different job; both are useful.
 Rule of thumb: `@` is "put this context in front of me", consult is "ask that
 session a question (or three)".
 
-## Status
-
-`0.1.x` — pre-1.0. The tool arguments and the provenance line are stable; the
-digest internals and the child-session mechanics may still move. Those changes
-land in a minor version and in [CHANGELOG.md](CHANGELOG.md).
-
-## Why not just fork the target session
-
-Forking is the obvious mechanism and it works: a child can be created from
-another session's event prefix and reproduces it byte-for-byte. It is also
-unusable in practice.
-
-Measured over 69 sessions on a development machine running DSH `0.2.2-rc.1`:
-
-| metric | median | max |
-|---|---|---|
-| full completed-turn prefix (what a fork copies) | **~1.5M tokens** | 17.8M |
-| of which user + assistant text | **1.7%** | — |
-| of which reasoning, tool output, bookkeeping | **98%** | — |
-
-A real session is mostly tool output and internal reasoning. Copying it costs
-more context than any model has, to deliver less information than a digest.
-Both numbers are reproducible on your own machine with `npm run dump` and
-`npm run bench` (see [Development](#development)).
-
-## Requirements
-
-- DeepSeek Harness `>=0.2.2-rc.1 <0.4.0` (the profile must mount `tools`,
-  `agents` and `sessionPersistence`; every standard profile does).
-- Node.js `>=22.15` for the offline tooling only; the plugin itself uses no
-  Node API beyond `node:crypto`.
-
-## Install
-
-```sh
-dsh plugin --profile <profile> add dsh-session-consult
-```
-
-From a checkout, for unreleased work:
-
-```sh
-git clone https://github.com/NorwinYu/dsh-session-consult.git
-dsh plugin --profile <profile> add ./dsh-session-consult
-```
-
-The package ships `cordis.patch.yml`, so installation also inserts the plugin
-row. To try it without touching a profile, patch one at boot:
-
-```yaml
-# extra.yml — the package must be resolvable by the profile
-- insert:
-    - id: consult-session
-      name: dsh-session-consult
-```
-
-```sh
-dsh --profile <profile> --patch ./extra.yml
-```
-
-Installing changes the composed profile: restart the running app (or start a new
-session) to see the tool.
-
-### Install from Discover (plugin index)
-
-The repository publishes a plugin index for the experimental Discover tab:
-
-```
-https://norwinyu.github.io/dsh-session-consult/market/index.json
-```
-
-1. Mount the market bundle (`@deepseek-ai/dsh-experimental-plugin-market-bundle`).
-2. Open **Discover → Add index source** and paste the URL.
-3. Pick *Session Consult* and install.
-
-`market/index.json` pins an exact commit per version, so what Discover installs
-is exactly what this repository contains at that commit.
-
 ## Usage
-
-Ask another session what it decided:
-
-```js
-consult_session({
-  session: "@[billing refactor](dsh-session:c2Vzc2lvbi0...)",
-  question: "Which migration order did we settle on, and what was rejected?",
-})
-```
-
-Return the digest instead of paying for a child turn:
-
-```js
-consult_session({ session: "billing refactor", question: "…", mode: "read" })
-```
 
 ### Addressing a session
 
@@ -150,23 +123,13 @@ Error: consult: "OSM" matches 2 sessions — retry with a more specific title or
   - OSM licence review · session-ff185161-… · 4d ago
 ```
 
-Discover what is available with `mode: "list"` (optionally filtered by the same
-fragment).
+### Reading instead of asking
 
-### What comes back
-
-Every result ends with provenance, so the caller can judge and cite it:
-
-```
-The migration order is customers → invoices → line items. The team rejected a
-single-shot migration because the invoice backfill locked the ledger table (T7).
-
----
-source: session-c2Vzc2lvbi0… (persisted, captured through seq 1841) · 12 turns ·
-digest ≈5.9K tok · text retained 100% · digest cache hit
+```js
+consult_session({ session: "billing refactor", question: "…", mode: "read" })
 ```
 
-Failure modes are answers too:
+### Failure modes are answers too
 
 - unknown target → a clear error, no partial digest;
 - empty history → "no completed turns yet", plus provenance;
@@ -184,8 +147,8 @@ rest of the budget on the newest turns:
 | expanded | the newest turns: full text plus a one-line tool trail (`· bash: pnpm test` → `→ ok`) |
 | text-only | when the trail does not fit, the conversation is kept and the calls are dropped |
 | index | older turns as one line each (`T12 U: … / A: …`) |
-| pinned | the first turn's task statement, so the caller always knows what the session was about |
 | dropped | whatever still does not fit, oldest first |
+| pinned | the first turn's task statement, **when it would otherwise be dropped** |
 
 Reasoning blocks, bookkeeping events (`step/*`, `job/*`, delivery receipts),
 system prompts, tool output bodies, and **host-injected user-role messages**
@@ -193,7 +156,7 @@ system prompts, tool output bodies, and **host-injected user-role messages**
 Only a human or a peer agent counts as conversation. Tool results are reduced to
 one line, and failures are marked `[error]`.
 
-Measured on the same 69 sessions:
+Measured over 69 sessions on a development machine running DSH `0.2.2-rc.1`:
 
 | session | source tokens | digest tokens | ratio | text kept |
 |---|---|---|---|---|
@@ -207,6 +170,18 @@ Measured on the same 69 sessions:
 newest-first, so recent context survives and the oldest turns are dropped
 deliberately; the provenance line reports how many. Worst observed build time:
 ~360 ms for a 60 MB log.
+
+### Why not just fork the target session
+
+Forking is the obvious mechanism and it works: a child can be created from
+another session's event prefix and reproduces it byte-for-byte. It is also
+unusable in practice — the same 69 sessions show a median completed-turn prefix
+of **~1.5M tokens** (max 17.8M), of which only **1.7%** is human/assistant text
+and **98%** is reasoning, tool output and bookkeeping. Copying that costs more
+context than any model has, to deliver less information than a digest.
+
+Both numbers are reproducible on your own machine with `npm run dump` and
+`npm run bench` (see [Development](#development)).
 
 ## Safety
 
@@ -222,7 +197,9 @@ looks like instructions. Two independent defences:
    plugin's own tool disappear from its view. In a verified run the child's
    request header listed only `glob`, `grep`, `read` and `read_image`.
 
-Self-consult is refused, so a session cannot recurse into itself.
+Self-consult is refused, so a session cannot recurse into itself. The child does
+inherit the target's working directory for those read-only tools — see
+[Privacy](#privacy).
 
 ## When the target session is running
 
@@ -239,6 +216,17 @@ Consulting a live session is safe and always returns a **prefix**:
 
 Everything after `captured through seq` is invisible by construction. The answer
 describes the target's past, never its present.
+
+## Troubleshooting
+
+| symptom | cause and fix |
+|---|---|
+| the tool never appears | the profile that mounts it is not the one the app booted; install into the same profile, then **restart the app** |
+| `matches N sessions` | the title is ambiguous — use a longer fragment or the id; `mode: "list"` shows candidates |
+| `no session matches "…"` | the error lists what is available; pick from it |
+| the answer says the record does not contain it | the digest is bounded — raise `budget_tokens`, or ask a narrower question |
+| `ask` feels slow | it is a full child turn; `mode: "read"` returns the digest without one |
+| a new session appears under the current one | that is the consult child; it is reused per `(caller, target)`, and `mode: "read"` creates none |
 
 ## Configuration
 
@@ -265,6 +253,9 @@ it on:
 - **The consulted session's text leaves the machine.** The digest is part of a
   model request, so it goes wherever your profile's model provider is. Anything
   that session printed — paths, tokens, customer data — can be in it.
+- **The child reads that session's workspace.** Its allow-listed tools run with
+  the consulted session's cwd, so files there are readable; set
+  `readTools: []` to make it digest-only.
 - **Nothing extra is collected.** The plugin has no telemetry, no network calls
   of its own, and writes nothing except the child sessions the host creates.
 - **`mode=read` still returns text**, it just does not spend a child turn.
@@ -275,18 +266,42 @@ it on:
 
 See [SECURITY.md](SECURITY.md) for reporting a vulnerability.
 
+## Discover (plugin index)
+
+The repository also publishes a plugin index for the experimental Discover tab:
+
+```
+https://norwinyu.github.io/dsh-session-consult/market/index.json
+```
+
+1. Mount the market bundle (`@deepseek-ai/dsh-experimental-plugin-market-bundle`).
+2. Open **Discover → Add index source** and paste the URL.
+3. Pick *Session Consult* and install.
+
+The index installs the published npm version (`dsh-session-consult@0.1.0`), not a
+git checkout.
+
 ## Development
 
 ```sh
-npm test                                        # 30 unit tests, synthetic fixtures
+npm test                                          # 30 unit tests, synthetic fixtures
 npm run dump -- --out ./session-dumps --limit 50  # read $DSH_HOME/sessions
 npm run bench -- ./session-dumps                  # digest cost table
 ```
 
 Tests use inline synthetic events: no session logs, no fixtures from a real
-installation, no network, no running harness. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for the layout and the rules a fixture must
-follow.
+installation, no network, no running harness.
+
+```
+index.mjs            plugin entry: tool registration, cache, child lifecycle
+src/digest.mjs       pure digest builder (no DSH or Node imports)
+src/policy.mjs       session-id normalisation and the child tool policy
+src/session.mjs      read-only session access, answer/error extraction, deadlines
+src/lookup.mjs       target discovery and title resolution
+scripts/             offline session dumping
+test/                node:test suites
+market/index.json    plugin index for the Discover tab
+```
 
 ## Limitations
 
@@ -301,6 +316,22 @@ follow.
   tokenizer.
 - **Synchronous.** `ask` waits for the child's turn; long children are bounded by
   `timeoutMs`.
+- **Not in the community market yet.** `dshmarket` reads the awesome-dsh-plugin
+  catalog; this plugin is not listed there. Use the Discover index above, or
+  `dsh plugin add`.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the layout, the two load-bearing
+invariants, and the fixture rules (synthetic only — never a real session log).
+Security reports go through [SECURITY.md](SECURITY.md); changes are recorded in
+[CHANGELOG.md](CHANGELOG.md).
+
+## Status
+
+`0.1.x` — pre-1.0. The tool arguments and the provenance line are stable; the
+digest internals and the child-session mechanics may still move. Those changes
+land in a minor version.
 
 ## License
 
