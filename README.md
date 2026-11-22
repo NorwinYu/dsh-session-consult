@@ -74,7 +74,7 @@ Both numbers are reproducible on your own machine with `npm run dump` and
 The package is not published to a registry yet; install from a checkout:
 
 ```sh
-git clone <this repository> dsh-session-consult
+git clone https://github.com/NorwinYu/dsh-session-consult.git
 dsh plugin --profile <profile> add ./dsh-session-consult
 ```
 

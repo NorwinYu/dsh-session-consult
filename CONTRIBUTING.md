@@ -7,7 +7,7 @@ Thanks for taking a look. This is a small plugin; the rules below keep it small.
 No dependencies, no build step:
 
 ```sh
-git clone <repository> dsh-session-consult
+git clone https://github.com/NorwinYu/dsh-session-consult.git
 cd dsh-session-consult
 npm test
 ```

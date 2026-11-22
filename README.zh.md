@@ -65,7 +65,7 @@ fork 是最直觉的机制，而且确实能跑通：可以用另一个会话的
 本包尚未发布到任何 registry，请从检出安装：
 
 ```sh
-git clone <本仓库地址> dsh-session-consult
+git clone https://github.com/NorwinYu/dsh-session-consult.git
 dsh plugin --profile <profile> add ./dsh-session-consult
 ```
 

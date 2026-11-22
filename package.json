@@ -4,6 +4,15 @@
   "description": "Let one DeepSeek Harness session consult another session's history through a bounded, information-dense digest \u2014 read-only, cheap, and provenance-labelled.",
   "type": "module",
   "license": "MIT",
+  "author": "NorwinYu",
+  "homepage": "https://github.com/NorwinYu/dsh-session-consult#readme",
+  "bugs": {
+    "url": "https://github.com/NorwinYu/dsh-session-consult/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NorwinYu/dsh-session-consult.git"
+  },
   "main": "index.mjs",
   "exports": {
     ".": "./index.mjs",
