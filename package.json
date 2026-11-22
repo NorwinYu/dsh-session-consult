@@ -1,0 +1,49 @@
+{
+  "name": "dsh-session-consult",
+  "version": "0.1.0",
+  "description": "Let one DeepSeek Harness session consult another session's history through a bounded, information-dense digest \u2014 read-only, cheap, and provenance-labelled.",
+  "type": "module",
+  "license": "MIT",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "index.mjs",
+    "src",
+    "scripts",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "session",
+    "context",
+    "agent",
+    "multi-agent",
+    "consult"
+  ],
+  "engines": {
+    "node": ">=22.15",
+    "dsh": ">=0.2.2-rc.1 <0.4.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test",
+    "bench": "node src/bench.mjs",
+    "dump": "node scripts/dump-sessions.mjs"
+  }
+}

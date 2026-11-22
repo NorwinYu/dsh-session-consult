@@ -1,0 +1,12 @@
+# dsh-session-consult bundle layer.
+#
+# Adds one model-facing tool on top of the core services. It needs:
+#   tools, agents, sessionPersistence   (mounted by every standard profile)
+# The `sessions` service is used when present, so a live target session is read
+# from memory instead of disk.
+#
+# With the plugin installed as a bundle, `dsh plugin add` wires this row into the
+# profile; the id is what the user's own patch layer targets for configuration.
+- insert:
+    - id: consult-session
+      name: './index.mjs'
