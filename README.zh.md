@@ -7,7 +7,8 @@
 让一个 DeepSeek Harness 会话去「咨询」另一个会话的历史——只读、低成本，并带回出处。
 
 会话是一份很好的记忆，却不是一个好的信使：它的上下文无法交给别的会话，而想「问它一句」
-就必须把它唤醒，唤醒就意味着改变它。这个插件补上了缺的那个动词：**consult**。
+就必须把它唤醒，唤醒就意味着改变它。这个插件补上了缺的那个动词：**consult**。它返回的是目标会话**过去某个时刻的快照**——
+不是实时通道，也不会反过来更新目标会话。
 
 > 不要和 [`dsh-consult`](https://www.npmjs.com/package/dsh-consult) 混淆：那个插件咨询的是
 > *其他模型*，这个插件咨询的是*其他会话*。
@@ -16,6 +17,8 @@
 
 ```sh
 dsh plugin --profile <profile> add dsh-session-consult
+# 卸载同样一条命令：
+# dsh plugin --profile <profile> remove dsh-session-consult
 ```
 
 重启 App（下一次启动时工具才出现），然后直接开口问：
@@ -252,7 +255,7 @@ https://norwinyu.github.io/dsh-session-consult/market/index.json
 2. 打开 **Discover → 添加索引源**，粘贴上面的地址；
 3. 在列表里选 *会话咨询* 安装。
 
-索引安装的是 npm 上发布的版本（`dsh-session-consult@0.1.0`），不是 git 检出。
+索引安装的是 npm 上发布的版本，因此跟随正式发布，而不是 git 检出。
 
 ## 开发
 
@@ -283,8 +286,9 @@ market/index.json    Discover 用的插件索引
 - **没有 `@` 菜单入口**。工具支持按标题解析，但输入框还没有把 consult 注册成引用来源。
 - **预算是字符级估算**。`chars = tokens × 3` 是 CJK/ASCII 混合估计，不是真正的分词器。
 - **同步**。`ask` 会等待子会话轮次结束，长任务受 `timeoutMs` 约束。
-- **还没有进社区市场**。`dshmarket` 读的是 awesome-dsh-plugin 目录，本插件尚未被收录；
-  请用上面的 Discover 索引，或直接 `dsh plugin add`。
+- **曝光取决于索引，而不是"装上了没"**。社区市场（`dshmarket`）读的是 awesome-dsh-plugin
+  维护的目录；Discover 读的是用户自己添加的索引源。本插件发布了自己的索引（见上），用它，
+  或者直接 `dsh plugin add`。
 
 ## 贡献
 

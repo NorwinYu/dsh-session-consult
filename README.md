@@ -9,7 +9,9 @@ cheap, and labelled with provenance.
 
 A session is a good memory and a bad messenger: its context cannot be handed to
 another session, and asking it a question means waking it up, which changes it.
-This plugin adds the missing verb: **consult**.
+This plugin adds the missing verb: **consult**. What comes back is a
+*snapshot* of the target's past — not a live link, and not an update to the
+target.
 
 > Not to be confused with [`dsh-consult`](https://www.npmjs.com/package/dsh-consult),
 > which consults *other models*. This plugin consults *other sessions*.
@@ -18,6 +20,8 @@ This plugin adds the missing verb: **consult**.
 
 ```sh
 dsh plugin --profile <profile> add dsh-session-consult
+# remove it just as easily:
+# dsh plugin --profile <profile> remove dsh-session-consult
 ```
 
 Restart the app (the tool appears on the next start), then just ask:
@@ -278,8 +282,8 @@ https://norwinyu.github.io/dsh-session-consult/market/index.json
 2. Open **Discover → Add index source** and paste the URL.
 3. Pick *Session Consult* and install.
 
-The index installs the published npm version (`dsh-session-consult@0.1.0`), not a
-git checkout.
+The index installs the version published to npm, so it tracks the released
+package rather than a git checkout.
 
 ## Development
 
@@ -316,9 +320,10 @@ market/index.json    plugin index for the Discover tab
   tokenizer.
 - **Synchronous.** `ask` waits for the child's turn; long children are bounded by
   `timeoutMs`.
-- **Not in the community market yet.** `dshmarket` reads the awesome-dsh-plugin
-  catalog; this plugin is not listed there. Use the Discover index above, or
-  `dsh plugin add`.
+- **Visibility follows indexes, not installation.** The community market
+  (`dshmarket`) reads the awesome-dsh-plugin catalog, a curated list maintained
+  by that project; the Discover tab reads whatever index sources a user adds.
+  This plugin publishes its own index (above) — use it, or `dsh plugin add`.
 
 ## Contributing
 
