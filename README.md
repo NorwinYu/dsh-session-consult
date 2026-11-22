@@ -1,5 +1,7 @@
 # dsh-session-consult
 
+[![npm](https://img.shields.io/npm/v/dsh-session-consult.svg)](https://www.npmjs.com/package/dsh-session-consult)
+
 Let one DeepSeek Harness session consult another session's history — read-only,
 cheap, and labelled with provenance.
 
@@ -71,17 +73,15 @@ Both numbers are reproducible on your own machine with `npm run dump` and
 
 ## Install
 
-The package is not published to a registry yet; install from a checkout:
+```sh
+dsh plugin --profile <profile> add dsh-session-consult
+```
+
+From a checkout, for unreleased work:
 
 ```sh
 git clone https://github.com/NorwinYu/dsh-session-consult.git
 dsh plugin --profile <profile> add ./dsh-session-consult
-```
-
-Once published, the same command takes the package name:
-
-```sh
-dsh plugin --profile <profile> add dsh-session-consult
 ```
 
 The package ships `cordis.patch.yml`, so installation also inserts the plugin

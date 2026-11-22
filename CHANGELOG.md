@@ -2,7 +2,7 @@
 
 ## 0.1.0
 
-First public release.
+First public release — published to npm as `dsh-session-consult@0.1.0`.
 
 - `consult_session` tool with `read` and `ask` modes.
 - Bounded digest: keeps every human/assistant text block, drops reasoning,

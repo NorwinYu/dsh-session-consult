@@ -59,11 +59,9 @@
       "versions": [
         {
           "version": "0.1.0",
-          "publishTimestamp": 1795343495,
+          "publishTimestamp": 1795345513,
           "source": {
-            "type": "git",
-            "url": "https://github.com/NorwinYu/dsh-session-consult",
-            "commit": "62482640fc7849304655cd17fd7b4c7e9d5a3eb6"
+            "type": "npm"
           },
           "engines": {
             "dsh": ">=0.2.2-rc.1 <0.4.0"

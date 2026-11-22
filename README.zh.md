@@ -1,5 +1,7 @@
 # dsh-session-consult
 
+[![npm](https://img.shields.io/npm/v/dsh-session-consult.svg)](https://www.npmjs.com/package/dsh-session-consult)
+
 让一个 DeepSeek Harness 会话去「咨询」另一个会话的历史——只读、低成本，并带回出处。
 
 会话是一份很好的记忆，却不是一个好的信使：它的上下文无法交给别的会话，而想「问它一句」
@@ -62,17 +64,15 @@ fork 是最直觉的机制，而且确实能跑通：可以用另一个会话的
 
 ## 安装
 
-本包尚未发布到任何 registry，请从检出安装：
+```sh
+dsh plugin --profile <profile> add dsh-session-consult
+```
+
+从检出安装（用于未发布的工作）：
 
 ```sh
 git clone https://github.com/NorwinYu/dsh-session-consult.git
 dsh plugin --profile <profile> add ./dsh-session-consult
-```
-
-发布之后，同一条命令可以直接用包名：
-
-```sh
-dsh plugin --profile <profile> add dsh-session-consult
 ```
 
 包内自带 `cordis.patch.yml`，安装时会一并插入插件行。若不想改动 profile，也可以在启动时
