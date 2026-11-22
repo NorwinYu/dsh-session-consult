@@ -8,9 +8,9 @@ another session, and asking it a question means waking it up, which changes it.
 This plugin adds the missing verb: **consult**.
 
 ```js
-consult_session({ session, question })                  // ask: a restricted child answers
-consult_session({ session, question, mode: "read" })    // read: return the digest itself
-consult_session({ mode: "list" })                        // discover what can be consulted
+consult_session({ session, question })                // ask: a restricted child answers
+consult_session({ session, question, mode: "read" })  // read: return the digest itself
+consult_session({ mode: "list" })                     // discover what can be consulted
 ```
 
 The consulted session is only ever **read**: its log is never written, it is
@@ -19,12 +19,29 @@ never steered or resumed, and no lock is taken.
 > Not to be confused with [`dsh-consult`](https://www.npmjs.com/package/dsh-consult),
 > which consults *other models*. This plugin consults *other sessions*.
 
+## Compared with `@`-referencing a session
+
+The harness can already pull another session into a message with an `@` mention.
+That is a different tool for a different job; both are useful.
+
+| | `@` reference | `consult_session` |
+|---|---|---|
+| direction | one-way: a snapshot is inserted into your message | question → answer, with follow-ups |
+| trigger | you type `@` in the composer, per message | the model decides, per question |
+| size | a fixed bounded preview, truncated | a digest sized to the question, budget adjustable |
+| tools | none — the snapshot is untrusted text in your context | the child may use read-only tools to check current files |
+| follow-ups | no, the capture is frozen | yes, one child keeps the thread |
+| target | whatever the picker offers | any session, by id, mention or title |
+| provenance | the snapshot is written into the turn | every result names the source, the capture point and what was dropped |
+
+Rule of thumb: `@` is "put this context in front of me", consult is "ask that
+session a question (or three)".
+
 ## Status
 
-`0.1.x` — the tool surface is stable, the on-disk session format it reads is the
-host's business, and the package follows the harness's experimental naming.
-Breaking changes, if any, land in a minor version and in
-[CHANGELOG.md](CHANGELOG.md).
+`0.1.x` — pre-1.0. The tool arguments and the provenance line are stable; the
+digest internals and the child-session mechanics may still move. Those changes
+land in a minor version and in [CHANGELOG.md](CHANGELOG.md).
 
 ## Why not just fork the target session
 
@@ -89,16 +106,16 @@ session) to see the tool.
 Ask another session what it decided:
 
 ```js
-consult_session(
+consult_session({
   session: "@[billing refactor](dsh-session:c2Vzc2lvbi0...)",
-  question: "Which migration order did we settle on, and what was rejected?"
-)
+  question: "Which migration order did we settle on, and what was rejected?",
+})
 ```
 
 Return the digest instead of paying for a child turn:
 
 ```js
-consult_session(session: "billing refactor", question: "…", mode: "read")
+consult_session({ session: "billing refactor", question: "…", mode: "read" })
 ```
 
 ### Addressing a session

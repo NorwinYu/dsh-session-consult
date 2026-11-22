@@ -6,9 +6,9 @@
 就必须把它唤醒，唤醒就意味着改变它。这个插件补上了缺的那个动词：**consult**。
 
 ```js
-consult_session({ session, question })                 // ask：由一个受限子会话作答
-consult_session({ session, question, mode: "read" })   // read：直接返回摘要
-consult_session({ mode: "list" })                       // 列出可咨询的会话
+consult_session({ session, question })                // ask：由一个受限子会话作答
+consult_session({ session, question, mode: "read" })  // read：直接返回摘要
+consult_session({ mode: "list" })                     // 列出可咨询的会话
 ```
 
 被咨询的会话**只会被读取**：绝不写入它的日志，绝不 steer 或 resume 它，也不加锁。
@@ -16,10 +16,26 @@ consult_session({ mode: "list" })                       // 列出可咨询的会
 > 不要和 [`dsh-consult`](https://www.npmjs.com/package/dsh-consult) 混淆：那个插件咨询的是
 > *其他模型*，这个插件咨询的是*其他会话*。
 
+## 和「`@` 引用会话」有什么区别
+
+Harness 已经支持用 `@` 把另一个会话拉进当前消息。那是另一件工具，两者互补：
+
+| | `@` 引用 | `consult_session` |
+|---|---|---|
+| 方向 | 单向：把一份快照插进你这条消息 | 提问 → 回答，可以继续追问 |
+| 触发 | 你在输入框里 `@`，只对那条消息生效 | 模型自己判断，按问题调用 |
+| 体量 | 固定的有界预览，超了截断 | 面向问题的摘要，预算可调 |
+| 工具 | 没有——快照只是你上下文里的不可信文本 | 子会话可以用只读工具核对当前文件 |
+| 多轮 | 不行，捕获后冻结 | 可以，复用一个子会话续聊 |
+| 目标 | 候选列表里能选到的会话 | 任意会话（id / 标题 / mention） |
+| 出处 | 快照随这轮消息写入 | 每次结果都写明来源、截到第几条、丢了多少 |
+
+一句话：`@` 是「把这段上下文摆到我面前」，consult 是「就这件事问它一句（或几句）」。
+
 ## 状态
 
-`0.1.x`——工具接口已稳定；它读取的会话格式属于宿主，不是本包的契约。破坏性变更会走 minor
-版本并记入 [CHANGELOG.md](CHANGELOG.md)。
+`0.1.x`——pre-1.0。工具参数和出处行的格式是稳定的；摘要内部算法和子会话机制还可能调整，
+这类变更走 minor 版本并记入 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 为什么不能直接 fork
 
@@ -80,16 +96,16 @@ dsh --profile <profile> --patch ./extra.yml
 问另一个会话当时决定了什么：
 
 ```js
-consult_session(
+consult_session({
   session: "@[billing refactor](dsh-session:c2Vzc2lvbi0...)",
-  question: "我们最后定的迁移顺序是什么？哪些方案被否掉了？"
-)
+  question: "我们最后定的迁移顺序是什么？哪些方案被否掉了？",
+})
 ```
 
 只看摘要、不为子会话的推理付费：
 
 ```js
-consult_session(session: "billing refactor", question: "…", mode: "read")
+consult_session({ session: "billing refactor", question: "…", mode: "read" })
 ```
 
 ### 会话的三种指定方式
