@@ -1,5 +1,14 @@
 node_modules/
 session-dumps/
+coverage/
+.plugin-market/
+
+# never commit local secrets or build leftovers
+.env
+.env.*
+.npmrc
+*.pem
+*.key
+*.tgz
 *.log
 .DS_Store
-coverage/
