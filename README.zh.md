@@ -91,6 +91,21 @@ dsh --profile <profile> --patch ./extra.yml
 
 安装会改变 profile 的组合结果：需要重启正在运行的 App，或新开会话，才能看到工具。
 
+### 从 Discover 安装（插件索引）
+
+本仓库发布了一个插件索引，供实验性的 Discover 标签页使用：
+
+```
+https://norwinyu.github.io/dsh-session-consult/market/index.json
+```
+
+1. 先挂载 market bundle（`@deepseek-ai/dsh-experimental-plugin-market-bundle`）；
+2. 打开 **Discover → 添加索引源**，粘贴上面的地址；
+3. 在列表里选 *会话咨询* 安装。
+
+`market/index.json` 里每个版本都钉死了具体 commit，所以 Discover 装到的就是这个仓库在该
+commit 上的内容。
+
 ## 使用
 
 问另一个会话当时决定了什么：

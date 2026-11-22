@@ -101,6 +101,21 @@ dsh --profile <profile> --patch ./extra.yml
 Installing changes the composed profile: restart the running app (or start a new
 session) to see the tool.
 
+### Install from Discover (plugin index)
+
+The repository publishes a plugin index for the experimental Discover tab:
+
+```
+https://norwinyu.github.io/dsh-session-consult/market/index.json
+```
+
+1. Mount the market bundle (`@deepseek-ai/dsh-experimental-plugin-market-bundle`).
+2. Open **Discover → Add index source** and paste the URL.
+3. Pick *Session Consult* and install.
+
+`market/index.json` pins an exact commit per version, so what Discover installs
+is exactly what this repository contains at that commit.
+
 ## Usage
 
 Ask another session what it decided:

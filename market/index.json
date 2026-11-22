@@ -1,0 +1,75 @@
+{
+  "format": 1,
+  "title": {
+    "en": "NorwinYu DSH plugins",
+    "zh": "NorwinYu DSH 插件"
+  },
+  "description": {
+    "en": "DeepSeek Harness plugins by NorwinYu.",
+    "zh": "NorwinYu 的 DeepSeek Harness 插件。"
+  },
+  "metadata": {
+    "categories": {
+      "session": {
+        "title": {
+          "en": "Session",
+          "zh": "会话"
+        }
+      }
+    },
+    "labels": {
+      "read-only": {
+        "title": {
+          "en": "Read-only",
+          "zh": "只读"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-session-consult",
+      "title": {
+        "en": "Session Consult",
+        "zh": "会话咨询"
+      },
+      "description": {
+        "en": "Ask another session what it decided: a bounded digest of its history, a read-only child agent, and provenance on every answer.",
+        "zh": "就某个问题去问另一个会话：有界摘要 + 只读子会话，每次回答都带出处。"
+      },
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJTZXNzaW9uIGNvbnN1bHQiPgo8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzFmNmZlYiIvPgo8cGF0aCBkPSJNMTYgMjBoMjZhNiA2IDAgMCAxIDYgNnYxMmE2IDYgMCAwIDEtNiA2SDI4bC05IDd2LTdoLTNhMCAwIDAgMCAxIDAgMHoiIGZpbGw9IiNmZmYiIG9wYWNpdHk9IjAuOTUiLz4KPGNpcmNsZSBjeD0iMjQiIGN5PSIzMiIgcj0iMi42IiBmaWxsPSIjMWY2ZmViIi8+CjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjIuNiIgZmlsbD0iIzFmNmZlYiIvPgo8Y2lyY2xlIGN4PSI0MCIgY3k9IjMyIiByPSIyLjYiIGZpbGw9IiMxZjZmZWIiLz4KPC9zdmc+",
+      "author": "NorwinYu",
+      "homepage": "https://github.com/NorwinYu/dsh-session-consult#readme",
+      "repository": {
+        "url": "https://github.com/NorwinYu/dsh-session-consult"
+      },
+      "metadata": {
+        "category": "session",
+        "labels": [
+          "read-only"
+        ],
+        "keywords": [
+          "session",
+          "context",
+          "consult",
+          "digest",
+          "multi-session"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 1795343495,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/NorwinYu/dsh-session-consult",
+            "commit": "62482640fc7849304655cd17fd7b4c7e9d5a3eb6"
+          },
+          "engines": {
+            "dsh": ">=0.2.2-rc.1 <0.4.0"
+          }
+        }
+      ]
+    }
+  ]
+}
